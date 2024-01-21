@@ -1,0 +1,107 @@
+2024-01-21 Notes added by Tanja Bhuiyan from Jonathan Henninger
+
+
+Install additional module for reading .czi files from here: https://pypi.org/project/czifile/
+
+If data includes brightfield images, explicitly input the "scaffold" channel when running the script with input parameter --s 
+
+
+2020-03-31 Directions to run in vitro droplet assay analysis
+
+##### RUNNING PROGRAM #####
+
+    Open Terminal and go to directory with python code:
+        $ cd /path/to/in_vitro_droplet_assay
+
+    To run the script, run the following function with two required arguments detailed below. You can also add optional arguments described below.
+
+    Without options:
+
+        $ ./main.py path/to/parent_data_folder path/to/output_folder
+
+    With options (options can be in any order):
+
+        $ ./main.py path/to/parent_data path/to/output_folder --param1 input --param2 input
+
+##### REQUIRED ARGUMENTS #####
+
+	path to parent data folder
+	
+	Parent data folder has the following structure:
+	
+    <PARENT_FOLDER>
+           <CONDITION 1>
+               Replicate_001.czi
+               Replicate_002.czi
+               Replicate_003.czi
+           <CONDITION 2>
+               Replicate_001.czi
+               Replicate_002.czi
+               Replicate_003.czi
+
+
+##### OPTIONAL ARGUMENTS #####
+
+    --tm    :   Intensity threshold multiplier. Used to identify droplets. Pixels with intensity less than
+                    (mean_background_intensity + (standard_deviation_intensity * threshold_multiplier))
+                will be thresholded out. Default is 3 (so 3 std's above the mean).
+
+    --r     :   Subset circle area (in px^2). After droplets are detected, droplet intensity is calculated in three ways:
+                    (1) Mean intensity of whole droplet
+                    (2) Max intensity of whole droplet
+                    (3) Mean intensity of smaller inner subset of droplet
+
+                The (3) option is to account for intensity drop-off at the edge of droplets. The 'r' parameter controls
+                the radius of the circle centered on the center of droplet to measure. Default is 9 px^2.
+
+    --min_a :   Minimum area threshold for calling droplets. Default is 9 px^2.
+
+    --max_a :   Maximum area threshold for calling droplets. Default is 500 px^2
+
+    --circ  :   Circularity threshold for calling droplets. Circularity = (4pi * Area / Perimeter^2). Generally,
+                this calculation falls between [0, 1], where 1 is a perfect circle (a square is about 0.6-0.7).
+                Because these calculations are done on pixels that don't form perfect lines,
+                sometimes circularity can be bigger than 1. Default is 0.8.
+
+    --s     :   Channel to use for scaffold. Can be partial string, but make sure it is unique to the channel name and is nowhere else in the file. Default behavior is to take an average of all channels to find droplets. What option is best depends on what question you are trying to answer.
+
+    --b     :   Value for background subtraction. Just does a straight subtraction. Default is 0.0. Should not affect partition ratio.
+
+    --pr    :   Droplet measurement to use for partition ratio. Options are:
+                'sub' for subset circle, 'mean' for mean intensity of whole droplet, 'max' for max intensity in droplet.
+                Default is 'sub'
+
+    --no-image  :   Flag that specifies not to output images of the called droplets that are saved to output.
+                    Will speed up the pipeline by a bit. Only need to write "--no-image"
+
+    --rand_bulk :   (STILL IN DEVELOPMENT; CAN'T BE USED YET)
+                    Flag that will calculate the bulk (C-out) differently. Intead of averaging outside the droplets,
+                    which could include uncalled droplets or out of focus droplets, it will randomly shuffle the image
+                    100 times and average across these random images. This should keep the same overall background but
+                    average out the droplets.
+
+##### OUTPUT #####
+
+    The output will contain the following directories in the same directory as the metadata file:
+
+    /individual/
+        /droplet_images/        : This will include pictures (.PNG) of the called droplets
+                                  to manually verify and/or tweak parameters.
+
+        individual_output.xlsx  : This will contain all output data from individual droplets with unique IDs for each
+                                  droplet. Each sheet is a unique experiment/sample.
+
+        box plots               : Box and dot plots of the partition ratios for all droplets for every experimental
+                                  condition for all channels
+
+        histogram plots         : Histograms of droplet areas for all experiments. Not on same scale.
+
+    /summary/
+
+        summary_output.xlsx     : This will contain all averaged output data from individual images of droplets.
+
+        error bar plots         : Error bar plots of partition ratios and condensed fraction for every channel
+                                  (WARNING: Not 100% sure that condensed fraction calculations are working correctly).
+
+    output_analysis_parameters.txt  : A text file that shows the parameters used for the most recent run.
+                                      This file will be written over every analysis unless you change the name.

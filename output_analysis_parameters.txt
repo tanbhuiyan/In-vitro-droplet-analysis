@@ -1,0 +1,1 @@
+"Namespace(b=0.0, bf_flag=False, circ=0.8, max_a=500, min_a=20, output_dirs={'output_parent': './', 'output_individual': './individual', 'output_summary': './summary', 'output_individual_images': './individual/droplet_images'}, output_image_flag=True, output_path='./', parent_path='./metadata', pr='subset', r=30, randomize_bulk_flag=False, s=None, tm=3.0)"
