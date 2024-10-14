@@ -110,9 +110,9 @@ def load_images_czi(file, data, input_params, folder): # Order of img shape is (
         else:
             num_of_channels = img.shape[2]
         
-        if img.shape[4] > 1:
-            print("ERROR: Can only accept single Z stacks")
-            sys.exit(0)
+#         if img.shape[4] > 1:
+#             print("ERROR: Can only accept single Z stacks")
+#             sys.exit(0)
         
         img = np.squeeze(img)  # gets rid of all singleton dimensions
         if len(img.shape) > 3:
